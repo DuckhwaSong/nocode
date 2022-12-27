@@ -1,0 +1,107 @@
+<!doctype html>
+<html>
+ <head>
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>springBoot+vue</title>
+  <!-- 참조링크 : https://hello-bryan.tistory.com/411?category=830632 -->
+ </head>
+
+<script src="/js/vue.3.2.45.prod.js"></script>
+<script src="https://unpkg.com/axios@1.0.0-alpha.1/dist/axios.min.js"></script>
+<script src="/js/gcsVue.js"></script>
+<!--script src="https://unpkg.com/vue@3"></script --><!-- 최신버전확인 -->
+
+<body id="body">
+<div id="app">
+    <ul>
+        <li v-for="(item, i) in students" :key="i">
+            {{ item.name }} ({{ item.age }})
+        </li>
+    </ul>
+
+    <ul>
+        <li v-for="id in [1, 2 ,3]" :key="id">{{ id }}</li>
+    </ul>
+    
+    <form method="post" action="/serv/123?postVal=test">
+    <input type="text" name="postVal1"><br>
+    <input type="submit"><br>
+    <button type="button" v-on:click="cSubmit">submit 전송</button><br>
+    </form>
+
+</div>
+</body>  
+
+<script>
+	gcsVue.data={
+                students: [
+                    {
+                        name : 'Kim',
+                        age: 18,
+                    },
+                    {
+                        name: 'Oh',
+                        age: 19
+                    },
+                    {
+                        name: 'Park',
+                        age: 19
+                    }
+                ],
+                cnt:0,result:{}
+           
+            };
+    var app = Vue.createApp({
+        data() { return gcsVue.data;
+           },
+		watch: {
+			cnt(newResult, oldResult){				
+				console.log(oldResult);
+				console.log(newResult);
+				alert(888);
+			},
+			result(newResult, oldResult){				
+				console.log(oldResult);
+				console.log(newResult);
+				alert(999);
+			}
+		},
+        methods: {
+			cSubmit:function(){
+				gcsVue.data.cnt++;
+				//this.cnt++;
+				//console.log(gcsVue.data);
+				alert(1);
+				
+				let axPromise0 = $api('https://api.github.com/users/hadley/orgs', 'get', '');
+				axPromise0.then(() => {
+					    console.log('Then!');
+					    
+					    }).catch(() => {
+							    console.log('Error!');
+							    });
+				//console.log(axPromise0);
+				
+				//let axPromise = gcsVue.methods.getDataGET('https://api.github.com/users/hadley/orgs');
+				//let axPromise = getData('https://api.github.com/users/hadley/orgs');
+				/*let axPromise = axiosGet('https://api.github.com/users/hadley/orgs');
+				console.log(axPromise);
+				axPromise.then(response=>response.json())
+				.then(json=>{
+						this.result = json;aletr(2);
+				}).catch(error=>{console.log(error);});*/
+				
+				
+				//console.log(gcsVue.data.result);
+			}
+			
+		}
+    }).mount('#app');
+    /*gcsVue.methods.getDataGET('https://api.github.com/users/hadley/orgs',function(){
+		
+		console.log(gcsVue.data.result);
+	});*/
+</script>
+
+</html>
