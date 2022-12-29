@@ -23,4 +23,10 @@ public class NocodeDao {
 		//System.out.println(list);
 		return list;
 	  }
+	
+	public List<Map<String,Object>> queryExec(String sql) {	
+		List<Map<String,Object>> list = jdbcTemplate.queryForList(sql);	
+		//System.out.println(list);
+		return list;
+	  }
 }

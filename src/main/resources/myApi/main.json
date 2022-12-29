@@ -1,0 +1,4 @@
+[
+	{"var1":"SELECT * FROM board WHERE seq IN (1)"}
+	,{"return":"SELECT * FROM board WHERE seq IN (1)"}
+]

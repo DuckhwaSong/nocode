@@ -1,10 +1,21 @@
 package com.allthink.nocode.library;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.servlet.http.HttpServletRequest;
+
+import org.springframework.core.io.ClassPathResource;
+
+import com.google.gson.Gson;
 
 public class NocodeLib {
 	/*public static Map<String, Object> mapper(HttpServletRequest request, Enumeration<String> params) throws Exception{
@@ -78,5 +89,51 @@ public class NocodeLib {
 		
 		return returnData;
 				
+	}
+	public static Map<String, Object> serviceCall(HttpServletRequest request) throws Exception{
+		ClassPathResource resource = new ClassPathResource("myApi/main.json");
+		Gson gson = new Gson();
+		
+		String content = null;
+		try {
+			Path path = Paths.get(resource.getURI());
+		    content = Files.lines(path).collect(Collectors.joining(System.lineSeparator()));
+		    //content.forEach(System.out::println);
+		} catch (Exception e) {
+			System.out.println(e);
+		}
+		
+		System.out.println(resource);
+		
+	    System.out.println("----------");
+	    System.out.println(content);
+	    System.out.println("----------");
+	    
+	    /*content = "{ \"k1\":\"v1\",\"k2\":\"v2\"}";
+	    System.out.println("----------");
+	    System.out.println(content);
+	    System.out.println("----------");*/
+	    
+	    
+		Map<String, Object> jsonData = new HashMap<>();
+		List<Map<String,Object>> jsonArray = new ArrayList<Map<String, Object>>();
+		
+		try {
+			//jsonData = (Map<String,Object>) gson.fromJson(content, jsonData.getClass());
+			jsonArray = gson.fromJson(content, jsonArray.getClass());
+			System.out.println("----------[		123		]----------");
+		    System.out.println(jsonArray.get(0).get("var1"));
+		    //jsonArray.forEach(System.out::println);
+		    System.out.println("------------------------------");
+		    
+		} catch (Exception e) {
+			System.out.println(e);
+		}
+		
+	    System.out.println("----------[		124		]----------");
+	    System.out.println(jsonData);
+	    System.out.println("------------------------------");
+		
+		return jsonData;
 	}
 }

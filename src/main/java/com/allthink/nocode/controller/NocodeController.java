@@ -15,8 +15,10 @@ import javax.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
 //import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.allthink.nocode.model.NocodeDao;
@@ -25,7 +27,6 @@ import com.allthink.nocode.library.NocodeLib;
 
 @Controller
 public class NocodeController {
-
 	//private Logger logger = LoggerFactory.getLogger(ServiceController.class);
 
 	
@@ -43,7 +44,7 @@ public class NocodeController {
 		Map<String, Object> returnData = new HashMap<>();
 		
 		//returnData.put("Servdb-sql", Collections.singletonMap("test", ServDao.servExec()));		
-		returnData.put("Servdb-sql2", nocodeDao.servExec());
+		returnData.put("Servdb-sql2", nocodeDao.queryExec("SELECT * FROM `board` WHERE seq NOT IN (0)"));
 		returnData.put("Chibumps", serviceUri );
 		
 		return returnData;
@@ -52,23 +53,37 @@ public class NocodeController {
 	
 	
 	
-	@RequestMapping("/serv")
+	@RequestMapping(path="/myApi/{serviceCall}")
+	//@RequestMapping(value=this.serviceUri)
 	@ResponseBody
-	public Map<String, Object> serv(HttpServletRequest request) throws Exception{
+	public Map<String, Object> serv(HttpServletRequest request,@PathVariable("serviceCall") String serviceCall) throws Exception{		
+		System.out.println(serviceCall);
+		
+		Map<String, Object> paramData = NocodeLib.serviceCall(request);
+		
 		return this.serv_(request);
 	}
 	
-	@RequestMapping("/serv/*")
+	// 파라메터 메핑어노테이션
+	@RequestMapping("/paramTest")
+	@ResponseBody
+	public Map<String, Object> serv(HttpServletRequest request,@RequestParam Map<String, Object> paramMap) throws Exception{		
+		System.out.println(paramMap.get("abc"));
+		return this.serv_(request);
+	}
+	
+	
+	@RequestMapping("/myApi/*")
 	@ResponseBody
 	public Map<String, Object> serv_(HttpServletRequest request) throws Exception{
 
 		Map<String, Object> returnData = new HashMap<>();
 
 		switch(request.getRequestURI()) {
-			case "/serv/httpInfo":
+			case "/myApi/httpInfo":
 				returnData = NocodeLib.httpInfo(request);
 				break;
-			case "/serv/testReq":
+			case "/myApi/testReq":
 				returnData = this.testReq(request);
 				break;
 			default:
