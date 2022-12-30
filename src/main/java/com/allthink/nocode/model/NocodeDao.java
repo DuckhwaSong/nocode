@@ -28,5 +28,19 @@ public class NocodeDao {
 		List<Map<String,Object>> list = jdbcTemplate.queryForList(sql);	
 		//System.out.println(list);
 		return list;
+	}
+	
+	
+	/*public List<Map<String,Object>> queryExec(String sql,List psArray) {	
+		List<Map<String,Object>> list = jdbcTemplate.queryForList(sql);	
+		//System.out.println(list);
+		return list;
+	}*/
+	
+	// queryForList(String sql, Object[] args, int[] argTypes)
+	  public List<Map<String,Object>> queryExec(String sql, Object[] args) {
+		int[] argTypes = { java.sql.Types.CHAR, java.sql.Types.INTEGER };
+		List<Map<String,Object>> list = jdbcTemplate.queryForList(sql, args, argTypes);
+		return list;
 	  }
 }

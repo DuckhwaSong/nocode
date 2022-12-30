@@ -4,6 +4,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
@@ -13,11 +14,16 @@ import java.util.stream.Stream;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 
+import com.allthink.nocode.model.NocodeDao;
 import com.google.gson.Gson;
 
 public class NocodeLib {
+	@Autowired
+	private NocodeDao nocodeDao;
+	
 	/*public static Map<String, Object> mapper(HttpServletRequest request, Enumeration<String> params) throws Exception{
 		Map<String, Object> paramData = new HashMap<>();
 		
@@ -30,6 +36,7 @@ public class NocodeLib {
 		return paramData;
 	}*/
 
+	// 리퀘스트 정보 전달
 	public static Map<String, Object> httpInfo(HttpServletRequest request) throws Exception{
 		// 서블릿 정보 확인 : https://www.devkuma.com/docs/jsp-servlet/httpservletrequest-%EB%A9%94%EC%86%8C%EB%93%9C/
 		
@@ -90,50 +97,76 @@ public class NocodeLib {
 		return returnData;
 				
 	}
-	public static Map<String, Object> serviceCall(HttpServletRequest request) throws Exception{
-		ClassPathResource resource = new ClassPathResource("myApi/main.json");
-		Gson gson = new Gson();
-		
-		String content = null;
+
+	
+	// 파일을 스트링으로 전달 - serviceCall 보조함수
+	private static String json2String(String serviceID) {
+		String returnStr= "";		
+		ClassPathResource resource = new ClassPathResource("myApi/"+serviceID+".json");		
 		try {
 			Path path = Paths.get(resource.getURI());
-		    content = Files.lines(path).collect(Collectors.joining(System.lineSeparator()));
-		    //content.forEach(System.out::println);
+			returnStr = Files.lines(path).collect(Collectors.joining(System.lineSeparator()));
 		} catch (Exception e) {
 			System.out.println(e);
 		}
-		
-		System.out.println(resource);
-		
-	    System.out.println("----------");
-	    System.out.println(content);
-	    System.out.println("----------");
-	    
-	    /*content = "{ \"k1\":\"v1\",\"k2\":\"v2\"}";
-	    System.out.println("----------");
-	    System.out.println(content);
-	    System.out.println("----------");*/
-	    
-	    
-		Map<String, Object> jsonData = new HashMap<>();
-		List<Map<String,Object>> jsonArray = new ArrayList<Map<String, Object>>();
-		
+		return returnStr;
+	}
+	
+	// json 문자열을 jsonArray로 변환 - serviceCall 보조함수
+	private static List<Map<String,Object>> json2Array(String jsonString) {
+		List<Map<String,Object>> jsonArray = new ArrayList<Map<String, Object>>();    
+		Gson gson = new Gson();
 		try {
-			//jsonData = (Map<String,Object>) gson.fromJson(content, jsonData.getClass());
-			jsonArray = gson.fromJson(content, jsonArray.getClass());
-			System.out.println("----------[		123		]----------");
-		    System.out.println(jsonArray.get(0).get("var1"));
-		    //jsonArray.forEach(System.out::println);
-		    System.out.println("------------------------------");
-		    
+			jsonArray = gson.fromJson(jsonString, jsonArray.getClass());		    
 		} catch (Exception e) {
 			System.out.println(e);
-		}
+		}		
+		return jsonArray;		
+	}
+	
+	// query를 분석하여 ps 형태로 전달 - serviceCall 보조함수
+	private static Map<String, Object> query2Map(Map<String, Object> requestData, String query){
+		Map<String, Object> returnData = new HashMap<>();
+		String query2="SELECT * FROM board WHERE seq IN ({:params.seq})";
+		String[] result = query2.split("\\{:");
+		System.out.println("result : " + Arrays.toString(result));
 		
-	    System.out.println("----------[		124		]----------");
-	    System.out.println(jsonData);
-	    System.out.println("------------------------------");
+        // 문자열중 변수 ? 처리
+       // value.toString().split("")
 		
-		return jsonData;
+		return returnData;
+	}
+
+	
+	/*private List<Map<String,Object>> queryExec(String sql) {	
+		List<Map<String,Object>> list = nocodeDao.queryExec("SELECT * FROM `board` WHERE seq NOT IN (0)");	
+
+
+		
+		return list;
+	  }*/
+
+	
+	// 서비스콜 메인 메서드
+	public static Map<String, Object> serviceCall(Map<String, Object> requestData) throws Exception{
+		
+		//Map<String, Object> returnData = new HashMap<>();
+		
+		String jsonString = json2String(requestData.get("serviceID").toString());
+		List<Map<String,Object>> jsonArray = json2Array(jsonString);
+		
+		System.out.println("----------[		146		]----------");
+	    for(int i = 0; i < jsonArray.size(); i++){		//arraylist 사이즈 만큼 for문을 실행합니다.
+	        System.out.println("jsonArray 순서 " + i + "번째 :" + jsonArray.get(i));
+	        jsonArray.get(i).forEach((key, value) -> {		// forEach
+	            System.out.println(key + " : " + value);
+
+	            System.out.println("query : " + query2Map(requestData,value.toString()));
+	        });
+	    }
+	    System.out.println("------------------------------");		
+
+	    
+		return requestData;
 	}
 }

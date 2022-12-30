@@ -32,12 +32,14 @@ public class NocodeController {
 	
 	@Autowired
 	private NocodeDao nocodeDao;
+	//private NocodeLib nocodeLib;
+	
 	
 	// application.properties 값을 가져옴
 	@Value("${nocode.service.uri}")
     private String serviceUri;
 
-	
+	// DB테스트
 	@RequestMapping("/Servdb")
 	@ResponseBody
 	public Map<String, Object> Servdb(HttpServletRequest request) throws Exception{
@@ -45,26 +47,18 @@ public class NocodeController {
 		
 		//returnData.put("Servdb-sql", Collections.singletonMap("test", ServDao.servExec()));		
 		returnData.put("Servdb-sql2", nocodeDao.queryExec("SELECT * FROM `board` WHERE seq NOT IN (0)"));
+		int i=0;
+		Object[] args = { i, i };
+		returnData.put("Servdb-sql3", nocodeDao.queryExec("SELECT * FROM `board` WHERE seq NOT IN (?)",args));
 		returnData.put("Chibumps", serviceUri );
 		
 		return returnData;
 		//return Collections.singletonMap("test", ServDao.servExec());
 	}
 	
+
 	
-	
-	@RequestMapping(path="/myApi/{serviceCall}")
-	//@RequestMapping(value=this.serviceUri)
-	@ResponseBody
-	public Map<String, Object> serv(HttpServletRequest request,@PathVariable("serviceCall") String serviceCall) throws Exception{		
-		System.out.println(serviceCall);
-		
-		Map<String, Object> paramData = NocodeLib.serviceCall(request);
-		
-		return this.serv_(request);
-	}
-	
-	// 파라메터 메핑어노테이션
+	// 파라메터 메핑어노테이션 테스트
 	@RequestMapping("/paramTest")
 	@ResponseBody
 	public Map<String, Object> serv(HttpServletRequest request,@RequestParam Map<String, Object> paramMap) throws Exception{		
@@ -73,6 +67,7 @@ public class NocodeController {
 	}
 	
 	
+	// 테스트!!
 	@RequestMapping("/myApi/*")
 	@ResponseBody
 	public Map<String, Object> serv_(HttpServletRequest request) throws Exception{
@@ -94,6 +89,7 @@ public class NocodeController {
 
 	}
 	
+	// 테스트 - 차후 삭제필요
 	public Map<String, Object> testReq(HttpServletRequest request) throws Exception{
 		Map<String, Object> returnData = new HashMap<>();
 
@@ -102,4 +98,16 @@ public class NocodeController {
 	}
 
 	
+	
+	
+	// 서비스콜 함수 - 얘만사용!!
+	@RequestMapping(path="/myApi/{serviceID}")
+	//@RequestMapping(value=this.serviceUri)
+	@ResponseBody
+	public Map<String, Object> serviceCall(HttpServletRequest request,@PathVariable("serviceID") String serviceID) throws Exception{		
+		Map<String, Object> requestData = NocodeLib.httpInfo(request);		
+		requestData.put("serviceID", serviceID);		
+		Map<String, Object> returnData = NocodeLib.serviceCall(requestData);		
+		return returnData;
+	}
 }

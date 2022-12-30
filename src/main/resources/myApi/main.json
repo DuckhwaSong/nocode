@@ -1,4 +1,4 @@
 [
-	{"var1":"SELECT * FROM board WHERE seq IN (1)"}
+	{"var1":"SELECT * FROM board WHERE seq IN ({:params.seq})"}
 	,{"return":"SELECT * FROM board WHERE seq IN (1)"}
 ]
