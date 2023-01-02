@@ -1,8 +1,10 @@
 package com.allthink.nocode.controller;
 
 import java.util.HashMap;
+import java.util.List;
 //import java.util.List;
 import java.util.Map;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Enumeration;
 //import java.io.DataInputStream;
@@ -24,6 +26,9 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.allthink.nocode.model.NocodeDao;
 import com.allthink.nocode.library.NocodeLib;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.ArrayList;
 
 @Controller
 public class NocodeController {
@@ -39,6 +44,43 @@ public class NocodeController {
 	@Value("${nocode.service.uri}")
     private String serviceUri;
 
+	
+	// DB테스트
+	@RequestMapping("/stringTest")
+	@ResponseBody
+	public Map<String, Object> stringTest(HttpServletRequest request) throws Exception{
+		Map<String, Object> returnData = new HashMap<>();
+		
+		// 쿼리 문자열을 가공하여 ? 표시 변경
+		String queryOrigin="SELECT * FROM board WHERE seq IN ({:params.seq},{:params.seq2})";
+		//String queryReplace=queryOrigin.replaceAll("\\{:*\\}","?");
+		String queryReplace=queryOrigin.replaceAll("\\{:.*\\}","?");
+		System.out.println("result : " + queryReplace);
+		
+		// 리스트에 패턴을 담는다
+		List<String> allMatches = new ArrayList<String>();		
+		Matcher m = Pattern.compile("\\{:.*\\}").matcher(queryOrigin);
+		while (m.find()) { allMatches.add(m.group()); }
+		
+		System.out.println("queryArgs : " + allMatches);
+
+		
+		//returnData.put("Servdb-sql", Collections.singletonMap("test", ServDao.servExec()));		
+		returnData.put("Servdb-sql2", nocodeDao.queryExec("SELECT * FROM `board` WHERE seq NOT IN (0)"));
+		//int i=0;
+		//Object[] args = { 1, 2 };
+		
+		List<String> argsList = new ArrayList<String>();
+		argsList.add("3");
+		argsList.add("2");
+		
+		returnData.put("Servdb-sql3", nocodeDao.queryExec("SELECT * FROM `board` WHERE seq NOT IN (?,?)",argsList.toArray()));
+		returnData.put("Chibumps", serviceUri );
+		
+		return returnData;
+		//return Collections.singletonMap("test", ServDao.servExec());
+	}	
+	
 	// DB테스트
 	@RequestMapping("/Servdb")
 	@ResponseBody
@@ -48,8 +90,8 @@ public class NocodeController {
 		//returnData.put("Servdb-sql", Collections.singletonMap("test", ServDao.servExec()));		
 		returnData.put("Servdb-sql2", nocodeDao.queryExec("SELECT * FROM `board` WHERE seq NOT IN (0)"));
 		int i=0;
-		Object[] args = { i, i };
-		returnData.put("Servdb-sql3", nocodeDao.queryExec("SELECT * FROM `board` WHERE seq NOT IN (?)",args));
+		Object[] args = { 1, 2 };
+		returnData.put("Servdb-sql3", nocodeDao.queryExec("SELECT * FROM `board` WHERE seq NOT IN (?,?)",args));
 		returnData.put("Chibumps", serviceUri );
 		
 		return returnData;
