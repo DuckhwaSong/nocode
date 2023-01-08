@@ -6,12 +6,13 @@ import org.springframework.stereotype.Component;
 
 import java.util.Map;
 import java.util.List;
+//import java.util.Arrays;
 
 @Component
 public class NocodeDao {
 	
 	@Autowired
-	private JdbcTemplate jdbcTemplate;
+	private static JdbcTemplate jdbcTemplate;
 	
 	/*public Map<String, Object> servExec() throws Exception{
 		return JdbcTemplate.queryForMap("SELECT * FROM `board` WHERE seq IN (1)");		
@@ -38,9 +39,14 @@ public class NocodeDao {
 	}*/
 	
 	// queryForList(String sql, Object[] args, int[] argTypes)
-	  public List<Map<String,Object>> queryExec(String sql, Object[] args) {
-		int[] argTypes = { java.sql.Types.CHAR, java.sql.Types.INTEGER };
-		List<Map<String,Object>> list = jdbcTemplate.queryForList(sql, args, argTypes);
+	  public static List<Map<String,Object>> queryExec(String sql, Object[] args) {
+		
+		//System.out.println("sql : " + sql);
+		//System.out.println("args : " + Arrays.toString(args));
+		List<Map<String,Object>> list = jdbcTemplate.queryForList(sql, args);
+		
+		//int[] argTypes = { java.sql.Types.CHAR, java.sql.Types.INTEGER };		// 인자가 2개인 경우 타입 		
+		//List<Map<String,Object>> list = jdbcTemplate.queryForList(sql, args, argTypes);
 		return list;
 	  }
 }

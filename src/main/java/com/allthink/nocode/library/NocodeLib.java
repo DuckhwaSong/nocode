@@ -9,6 +9,8 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -22,7 +24,7 @@ import com.google.gson.Gson;
 
 public class NocodeLib {
 	@Autowired
-	private NocodeDao nocodeDao;
+	private static NocodeDao nocodeDao;
 	
 	/*public static Map<String, Object> mapper(HttpServletRequest request, Enumeration<String> params) throws Exception{
 		Map<String, Object> paramData = new HashMap<>();
@@ -125,18 +127,39 @@ public class NocodeLib {
 	}
 	
 	// query를 분석하여 ps 형태로 전달 - serviceCall 보조함수
-	private static Map<String, Object> query2Map(Map<String, Object> requestData, String query){
+	private static Map<String, Object> query2Map(Map<String, Object> requestData, String queryOrigin){	
+		// 쿼리 문자열을 가공하여 ? 표시 변경
+		String queryReplace=queryOrigin.replaceAll("\\{:[^\\}]*\\}","?");
+		
+		// 리스트에 패턴을 담는다
+		List<String> preparedStatement = new ArrayList<String>();
+		Matcher m = Pattern.compile("\\{:[^\\}]*\\}").matcher(queryOrigin);
+		String tmpKey="";
+		String tmpValue="";
+		while (m.find()) { 
+			tmpKey=m.group().toString().replaceAll("\\{:","").replaceAll("\\}","");
+			tmpValue=parser(requestData,tmpKey);
+			preparedStatement.add(tmpValue);
+			
+		}
+		System.out.println("queryExec1 : " + NocodeDao.queryExec(queryReplace,preparedStatement.toArray()));
+
 		Map<String, Object> returnData = new HashMap<>();
-		String query2="SELECT * FROM board WHERE seq IN ({:params.seq})";
-		String[] result = query2.split("\\{:");
-		System.out.println("result : " + Arrays.toString(result));
-		
-        // 문자열중 변수 ? 처리
-       // value.toString().split("")
-		
+
 		return returnData;
 	}
-
+	// 변수 세팅을 위한 재귀함수  - serviceCall 보조함수
+	private static String parser(Map<String, Object> datas, String tmpKey){
+		String[] tmpKeys=tmpKey.split("\\.");
+		
+		if(tmpKeys.length == 1 ) return  datas.get(tmpKeys[0]).toString();
+		else if(tmpKeys.length > 1 && datas.get(tmpKeys[0]).getClass().getName()=="java.util.HashMap") {
+			Map<String, Object> reData = (Map<String, Object>) datas.get(tmpKeys[0]);
+			String reKey=tmpKey.replaceAll(tmpKeys[0]+"\\.", "");
+			return parser( reData , reKey);			
+		}
+		return "";
+	}
 	
 	/*private List<Map<String,Object>> queryExec(String sql) {	
 		List<Map<String,Object>> list = nocodeDao.queryExec("SELECT * FROM `board` WHERE seq NOT IN (0)");	
@@ -164,9 +187,11 @@ public class NocodeLib {
 	            System.out.println("query : " + query2Map(requestData,value.toString()));
 	        });
 	    }
-	    System.out.println("------------------------------");		
+	    System.out.println("------------------------------");
 
 	    
 		return requestData;
 	}
+	
+
 }

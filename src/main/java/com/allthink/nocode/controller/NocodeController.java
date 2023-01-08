@@ -45,25 +45,71 @@ public class NocodeController {
     private String serviceUri;
 
 	
+	private String stringTest2(Map<String, Object> datas, String tmpKey){
+		String[] tmpKeys=tmpKey.split("\\.");
+		
+		if(tmpKeys.length == 1 ) return  datas.get(tmpKeys[0]).toString();
+		else if(tmpKeys.length > 1 && datas.get(tmpKeys[0]).getClass().getName()=="java.util.HashMap") {
+			Map<String, Object> reData = (Map<String, Object>) datas.get(tmpKeys[0]);
+			String reKey=tmpKey.replaceAll(tmpKeys[0]+"\\.", "");			
+			//System.out.println("reKey : " + reKey);
+			//System.out.println("reData : " + reData);
+			return stringTest2( reData , reKey);			
+		}
+		return "";
+	}
+	
 	// DB테스트
 	@RequestMapping("/stringTest")
 	@ResponseBody
 	public Map<String, Object> stringTest(HttpServletRequest request) throws Exception{
 		Map<String, Object> returnData = new HashMap<>();
 		
+		// datas 샘플
+		Map<String, Object> datas = new HashMap<>();
+		Map<String, Object> paramData = new HashMap<>();
+		Map<String, Object> varData = new HashMap<>();
+		paramData.put("seq", "1");
+		paramData.put("seq2", "2");
+		paramData.put("seq3", "3");
+		
+		varData.put("abc", "test1");
+		datas.put("params", paramData);
+		datas.put("varData", varData);
+		
+		System.out.println("datas : " + datas.get("params"));
+
+		
 		// 쿼리 문자열을 가공하여 ? 표시 변경
-		String queryOrigin="SELECT * FROM board WHERE seq IN ({:params.seq},{:params.seq2})";
-		//String queryReplace=queryOrigin.replaceAll("\\{:*\\}","?");
-		String queryReplace=queryOrigin.replaceAll("\\{:.*\\}","?");
+		String queryOrigin="SELECT * FROM board WHERE seq IN ({:params.seq},{:params.seq2},{:params.seq3})";
+		String queryReplace=queryOrigin.replaceAll("\\{:[^\\}]*\\}","?");
 		System.out.println("result : " + queryReplace);
 		
 		// 리스트에 패턴을 담는다
-		List<String> allMatches = new ArrayList<String>();		
-		Matcher m = Pattern.compile("\\{:.*\\}").matcher(queryOrigin);
-		while (m.find()) { allMatches.add(m.group()); }
+		List<String> preparedStatement = new ArrayList<String>();
+		Matcher m = Pattern.compile("\\{:[^\\}]*\\}").matcher(queryOrigin);
+		String tmpKey="";
+		String tmpValue="";
+		while (m.find()) { 
+			tmpKey=m.group().toString().replaceAll("\\{:","").replaceAll("\\}","");
+			tmpValue=stringTest2(datas,tmpKey);
+			
+			//System.out.println("tmpValue : " + tmpValue);
+			preparedStatement.add(tmpValue);
+			
+		}
 		
-		System.out.println("queryArgs : " + allMatches);
+		System.out.println("queryArgs : " + preparedStatement);
+		System.out.println("toArray1 : " + Arrays.toString(preparedStatement.toArray()));
+		System.out.println("queryExec1 : " + nocodeDao.queryExec(queryReplace,preparedStatement.toArray()));
+		//System.out.println("queryExec2 : " + nocodeDao.queryExec("SELECT * FROM `board` WHERE seq NOT IN (?,?)",preparedStatement.toArray()));
+		//returnData.put("Servdb-sql00", nocodeDao.queryExec(queryReplace,preparedStatement.toArray()));
 
+
+		
+		
+		
+		
 		
 		//returnData.put("Servdb-sql", Collections.singletonMap("test", ServDao.servExec()));		
 		returnData.put("Servdb-sql2", nocodeDao.queryExec("SELECT * FROM `board` WHERE seq NOT IN (0)"));
@@ -74,6 +120,8 @@ public class NocodeController {
 		argsList.add("3");
 		argsList.add("2");
 		
+		System.out.println("toArray2 : " + Arrays.toString(argsList.toArray()));
+
 		returnData.put("Servdb-sql3", nocodeDao.queryExec("SELECT * FROM `board` WHERE seq NOT IN (?,?)",argsList.toArray()));
 		returnData.put("Chibumps", serviceUri );
 		
