@@ -37,7 +37,9 @@ public class NocodeController {
 	
 	@Autowired
 	private NocodeDao nocodeDao;
-	//private NocodeLib nocodeLib;
+	
+	@Autowired
+	private NocodeLib nocodeLib;
 	
 	
 	// application.properties 값을 가져옴
@@ -101,15 +103,19 @@ public class NocodeController {
 		
 		System.out.println("queryArgs : " + preparedStatement);
 		System.out.println("toArray1 : " + Arrays.toString(preparedStatement.toArray()));
-		System.out.println("queryExec1 : " + nocodeDao.queryExec(queryReplace,preparedStatement.toArray()));
+		List<Object> objectList = new ArrayList<Object>(preparedStatement);
+
+		
+		System.out.println("queryExec1 : " + nocodeDao.queryExec(queryReplace,objectList.toArray()));
+		returnData.put("queryExec1",nocodeDao.queryExec(queryReplace,objectList.toArray()));
+		//System.out.println("queryExec2 : " + nocodeDao.queryExec(queryReplace,[1,2]));
 		//System.out.println("queryExec2 : " + nocodeDao.queryExec("SELECT * FROM `board` WHERE seq NOT IN (?,?)",preparedStatement.toArray()));
 		//returnData.put("Servdb-sql00", nocodeDao.queryExec(queryReplace,preparedStatement.toArray()));
 
-
 		
 		
 		
-		
+	
 		
 		//returnData.put("Servdb-sql", Collections.singletonMap("test", ServDao.servExec()));		
 		returnData.put("Servdb-sql2", nocodeDao.queryExec("SELECT * FROM `board` WHERE seq NOT IN (0)"));
@@ -122,7 +128,7 @@ public class NocodeController {
 		
 		System.out.println("toArray2 : " + Arrays.toString(argsList.toArray()));
 
-		returnData.put("Servdb-sql3", nocodeDao.queryExec("SELECT * FROM `board` WHERE seq NOT IN (?,?)",argsList.toArray()));
+		//returnData.put("Servdb-sql3", nocodeDao.queryExec("SELECT * FROM `board` WHERE seq NOT IN (?,?)",argsList.toArray()));
 		returnData.put("Chibumps", serviceUri );
 		
 		return returnData;
@@ -135,12 +141,14 @@ public class NocodeController {
 	public Map<String, Object> Servdb(HttpServletRequest request) throws Exception{
 		Map<String, Object> returnData = new HashMap<>();
 		
-		//returnData.put("Servdb-sql", Collections.singletonMap("test", ServDao.servExec()));		
-		returnData.put("Servdb-sql2", nocodeDao.queryExec("SELECT * FROM `board` WHERE seq NOT IN (0)"));
+		//returnData.put("Servdb-sql", Collections.singletonMap("test", nocodeDao.servExec()));		
+		//returnData.put("Servdb-sql1", nocodeDao.servExec());
+		//returnData.put("Servdb-sql2", nocodeDao.queryExec("SELECT * FROM `board` WHERE seq NOT IN (0)"));
 		int i=0;
 		Object[] args = { 1, 2 };
+		System.out.println("args1 : " + args);
 		returnData.put("Servdb-sql3", nocodeDao.queryExec("SELECT * FROM `board` WHERE seq NOT IN (?,?)",args));
-		returnData.put("Chibumps", serviceUri );
+		//returnData.put("Chibumps", serviceUri );
 		
 		return returnData;
 		//return Collections.singletonMap("test", ServDao.servExec());
@@ -166,13 +174,13 @@ public class NocodeController {
 
 		switch(request.getRequestURI()) {
 			case "/myApi/httpInfo":
-				returnData = NocodeLib.httpInfo(request);
+				returnData = nocodeLib.httpInfo(request);
 				break;
 			case "/myApi/testReq":
 				returnData = this.testReq(request);
 				break;
 			default:
-				returnData = NocodeLib.httpInfo(request);
+				returnData = nocodeLib.httpInfo(request);
 				break;
 		}
 		return returnData;
@@ -195,9 +203,9 @@ public class NocodeController {
 	//@RequestMapping(value=this.serviceUri)
 	@ResponseBody
 	public Map<String, Object> serviceCall(HttpServletRequest request,@PathVariable("serviceID") String serviceID) throws Exception{		
-		Map<String, Object> requestData = NocodeLib.httpInfo(request);		
+		Map<String, Object> requestData = nocodeLib.httpInfo(request);
 		requestData.put("serviceID", serviceID);		
-		Map<String, Object> returnData = NocodeLib.serviceCall(requestData);		
+		Map<String, Object> returnData = nocodeLib.serviceCall(requestData);		
 		return returnData;
 	}
 }

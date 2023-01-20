@@ -18,13 +18,15 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.stereotype.Component;
 
 import com.allthink.nocode.model.NocodeDao;
 import com.google.gson.Gson;
 
+@Component
 public class NocodeLib {
 	@Autowired
-	private static NocodeDao nocodeDao;
+	private NocodeDao nocodeDao;
 	
 	/*public static Map<String, Object> mapper(HttpServletRequest request, Enumeration<String> params) throws Exception{
 		Map<String, Object> paramData = new HashMap<>();
@@ -39,7 +41,7 @@ public class NocodeLib {
 	}*/
 
 	// 리퀘스트 정보 전달
-	public static Map<String, Object> httpInfo(HttpServletRequest request) throws Exception{
+	public Map<String, Object> httpInfo(HttpServletRequest request) throws Exception{
 		// 서블릿 정보 확인 : https://www.devkuma.com/docs/jsp-servlet/httpservletrequest-%EB%A9%94%EC%86%8C%EB%93%9C/
 		
 		Map<String, Object> paramData = new HashMap<>();
@@ -102,7 +104,7 @@ public class NocodeLib {
 
 	
 	// 파일을 스트링으로 전달 - serviceCall 보조함수
-	private static String json2String(String serviceID) {
+	private String json2String(String serviceID) {
 		String returnStr= "";		
 		ClassPathResource resource = new ClassPathResource("myApi/"+serviceID+".json");		
 		try {
@@ -115,7 +117,7 @@ public class NocodeLib {
 	}
 	
 	// json 문자열을 jsonArray로 변환 - serviceCall 보조함수
-	private static List<Map<String,Object>> json2Array(String jsonString) {
+	private List<Map<String,Object>> json2Array(String jsonString) {
 		List<Map<String,Object>> jsonArray = new ArrayList<Map<String, Object>>();    
 		Gson gson = new Gson();
 		try {
@@ -127,7 +129,7 @@ public class NocodeLib {
 	}
 	
 	// query를 분석하여 ps 형태로 전달 - serviceCall 보조함수
-	private static Map<String, Object> query2Map(Map<String, Object> requestData, String queryOrigin){	
+	private Map<String, Object> query2Map(Map<String, Object> requestData, String queryOrigin){	
 		// 쿼리 문자열을 가공하여 ? 표시 변경
 		String queryReplace=queryOrigin.replaceAll("\\{:[^\\}]*\\}","?");
 		
@@ -142,14 +144,14 @@ public class NocodeLib {
 			preparedStatement.add(tmpValue);
 			
 		}
-		System.out.println("queryExec1 : " + NocodeDao.queryExec(queryReplace,preparedStatement.toArray()));
+		//System.out.println("queryExec1 : " + NocodeDao.queryExec(queryReplace,preparedStatement.toArray()));
 
 		Map<String, Object> returnData = new HashMap<>();
 
 		return returnData;
 	}
 	// 변수 세팅을 위한 재귀함수  - serviceCall 보조함수
-	private static String parser(Map<String, Object> datas, String tmpKey){
+	private String parser(Map<String, Object> datas, String tmpKey){
 		String[] tmpKeys=tmpKey.split("\\.");
 		
 		if(tmpKeys.length == 1 ) return  datas.get(tmpKeys[0]).toString();
@@ -171,10 +173,7 @@ public class NocodeLib {
 
 	
 	// 서비스콜 메인 메서드
-	public static Map<String, Object> serviceCall(Map<String, Object> requestData) throws Exception{
-		
-		//Map<String, Object> returnData = new HashMap<>();
-		
+	public Map<String, Object> serviceCall(Map<String, Object> requestData) throws Exception{		
 		String jsonString = json2String(requestData.get("serviceID").toString());
 		List<Map<String,Object>> jsonArray = json2Array(jsonString);
 		

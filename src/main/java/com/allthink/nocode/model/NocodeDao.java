@@ -12,7 +12,7 @@ import java.util.List;
 public class NocodeDao {
 	
 	@Autowired
-	private static JdbcTemplate jdbcTemplate;
+	private JdbcTemplate jdbcTemplate;
 	
 	/*public Map<String, Object> servExec() throws Exception{
 		return JdbcTemplate.queryForMap("SELECT * FROM `board` WHERE seq IN (1)");		
@@ -26,8 +26,9 @@ public class NocodeDao {
 	  }
 	
 	public List<Map<String,Object>> queryExec(String sql) {	
+		System.out.println("sql : " + sql);
 		List<Map<String,Object>> list = jdbcTemplate.queryForList(sql);	
-		//System.out.println(list);
+		System.out.println(list);
 		return list;
 	}
 	
@@ -39,10 +40,10 @@ public class NocodeDao {
 	}*/
 	
 	// queryForList(String sql, Object[] args, int[] argTypes)
-	  public static List<Map<String,Object>> queryExec(String sql, Object[] args) {
+	  public List<Map<String,Object>> queryExec(String sql, Object[] args) {
 		
 		//System.out.println("sql : " + sql);
-		//System.out.println("args : " + Arrays.toString(args));
+		//System.out.println("args : " + args);
 		List<Map<String,Object>> list = jdbcTemplate.queryForList(sql, args);
 		
 		//int[] argTypes = { java.sql.Types.CHAR, java.sql.Types.INTEGER };		// 인자가 2개인 경우 타입 		
