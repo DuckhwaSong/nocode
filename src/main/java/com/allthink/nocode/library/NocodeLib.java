@@ -127,6 +127,18 @@ public class NocodeLib {
 		}		
 		return jsonArray;		
 	}
+
+	// json 문자열을 jsonMap으로 변환 - serviceCall 보조함수
+	private Map<String,Object> json2Map(String jsonString) {
+		Map<String,Object> jsonMap = new HashMap<>();;    
+		Gson gson = new Gson();
+		try {
+			jsonMap = gson.fromJson(jsonString, jsonMap.getClass());		    
+		} catch (Exception e) {
+			System.out.println(e);
+		}		
+		return jsonMap;	
+	}
 	
 	// query를 분석하여 ps 형태로 전달 - serviceCall 보조함수
 	private Map<String, Object> query2Map(Map<String, Object> requestData, String queryOrigin){	
@@ -175,18 +187,27 @@ public class NocodeLib {
 	// 서비스콜 메인 메서드
 	public Map<String, Object> serviceCall(Map<String, Object> requestData) throws Exception{		
 		String jsonString = json2String(requestData.get("serviceID").toString());
-		List<Map<String,Object>> jsonArray = json2Array(jsonString);
+		//List<Map<String,Object>> jsonArray = json2Array(jsonString);
+		Map<String,Object> jsonMap = json2Map(jsonString);		
+		//System.out.println(jsonMap.get("process").getClass());	//datas.get(tmpKeys[0]).toString();
+		System.out.println(jsonMap.get("process").getClass());
+		//System.out.println(jsonMap.get("process").get("0"));
+		//List<Map<String,Object>> processMap = json2Array(jsonMap.get("process").toString());
+		//ArrayList<String> processList = jsonMap.get("process");
+		//List<Object> objectList = new ArrayList<Object>
 		
+
 		System.out.println("----------[		146		]----------");
-	    for(int i = 0; i < jsonArray.size(); i++){		//arraylist 사이즈 만큼 for문을 실행합니다.
-	        System.out.println("jsonArray 순서 " + i + "번째 :" + jsonArray.get(i));
-	        jsonArray.get(i).forEach((key, value) -> {		// forEach
+		//System.out.println(processList);
+	    /*for(int i = 0; i < processMap.size(); i++){		//arraylist 사이즈 만큼 for문을 실행합니다.
+	        System.out.println("processMap 순서 " + i + "번째 :" + processMap.get(i));
+	        processMap.get(i).forEach((key, value) -> {		// forEach
 	            System.out.println(key + " : " + value);
 
 	            System.out.println("query : " + query2Map(requestData,value.toString()));
 	        });
 	    }
-	    System.out.println("------------------------------");
+	    System.out.println("------------------------------");*/
 
 	    
 		return requestData;

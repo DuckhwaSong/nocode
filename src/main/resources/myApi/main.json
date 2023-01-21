@@ -1,4 +1,8 @@
-[
-	{"var1":"SELECT * FROM board WHERE seq IN ({:params.seq})"}
-	,{"return":"SELECT * FROM board WHERE seq IN (1)"}
-]
+{
+	"version":"1"
+	,"process":[
+		{"var1":"SELECT * FROM borad"}
+		,{"var2":"SELECT * FROM borad"}
+		]
+	,"return":"SELECT * FROM borad WHERE seq={:params.seq}"
+}

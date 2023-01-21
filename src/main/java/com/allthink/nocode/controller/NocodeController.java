@@ -166,19 +166,22 @@ public class NocodeController {
 	
 	
 	// 테스트!!
-	@RequestMapping("/myApi/*")
+	@RequestMapping("/myApi2/*")
 	@ResponseBody
 	public Map<String, Object> serv_(HttpServletRequest request) throws Exception{
 
 		Map<String, Object> returnData = new HashMap<>();
 
 		switch(request.getRequestURI()) {
-			case "/myApi/httpInfo":
+			case "/myApi2/httpInfo":
 				returnData = nocodeLib.httpInfo(request);
 				break;
-			case "/myApi/testReq":
+			case "/myApi2/testReq":
 				returnData = this.testReq(request);
 				break;
+			case "/myApi2/mapTest":
+				returnData = this.mapTest(request);
+				break;				
 			default:
 				returnData = nocodeLib.httpInfo(request);
 				break;
@@ -194,7 +197,20 @@ public class NocodeController {
 		returnData.put("httpInfo", "123");
 		return returnData;
 	}
-
+	// 테스트 - 차후 삭제필요
+	public Map<String, Object> mapTest(HttpServletRequest request) throws Exception{
+		Map<String, Object> returnData = new HashMap<>();
+		Map<String, Object> processData = new HashMap<>();
+		processData.put("var1", "SELECT * FROM borad");
+		processData.put("var2", "SELECT * FROM borad");
+		returnData.put("version", "1");
+		returnData.put("process", processData);
+		returnData.put("return", "SELECT * FROM borad WHERE seq={:params.seq}");
+		
+		System.out.println(processData.getClass());
+		
+		return returnData;
+	}
 	
 	
 	
