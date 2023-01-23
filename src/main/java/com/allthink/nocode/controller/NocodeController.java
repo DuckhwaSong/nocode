@@ -201,8 +201,8 @@ public class NocodeController {
 	public Map<String, Object> mapTest(HttpServletRequest request) throws Exception{
 		Map<String, Object> returnData = new HashMap<>();
 		Map<String, Object> processData = new HashMap<>();
-		processData.put("var1", "SELECT * FROM borad");
-		processData.put("var2", "SELECT * FROM borad");
+		processData.put("var1", "SELECT * FROM board");
+		processData.put("var2", "SELECT * FROM board");
 		returnData.put("version", "1");
 		returnData.put("process", processData);
 		returnData.put("return", "SELECT * FROM borad WHERE seq={:params.seq}");
@@ -218,10 +218,16 @@ public class NocodeController {
 	@RequestMapping(path="/myApi/{serviceID}")
 	//@RequestMapping(value=this.serviceUri)
 	@ResponseBody
-	public Map<String, Object> serviceCall(HttpServletRequest request,@PathVariable("serviceID") String serviceID) throws Exception{		
+	public List<Map<String,Object>> serviceCall(HttpServletRequest request,@PathVariable("serviceID") String serviceID) throws Exception{		
+		Map<String, Object> requestData = nocodeLib.httpInfo(request);
+		requestData.put("serviceID", serviceID);		
+		List<Map<String,Object>> returnData = nocodeLib.serviceCall(requestData);		
+		return returnData;
+	}	
+	/*public Map<String, Object> serviceCall(HttpServletRequest request,@PathVariable("serviceID") String serviceID) throws Exception{		
 		Map<String, Object> requestData = nocodeLib.httpInfo(request);
 		requestData.put("serviceID", serviceID);		
 		Map<String, Object> returnData = nocodeLib.serviceCall(requestData);		
 		return returnData;
-	}
+	}*/
 }

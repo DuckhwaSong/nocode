@@ -130,7 +130,7 @@ public class NocodeLib {
 
 	// json 문자열을 jsonMap으로 변환 - serviceCall 보조함수
 	private Map<String,Object> json2Map(String jsonString) {
-		Map<String,Object> jsonMap = new HashMap<>();;    
+		Map<String,Object> jsonMap = new HashMap<>();
 		Gson gson = new Gson();
 		try {
 			jsonMap = gson.fromJson(jsonString, jsonMap.getClass());		    
@@ -140,8 +140,14 @@ public class NocodeLib {
 		return jsonMap;	
 	}
 	
+	// json 문자열을 jsonMap으로 변환 - serviceCall 보조함수
+	private String map2Json(Map<String, Object> jsonMap) {
+		Gson gson = new Gson();
+		return gson.toJson(jsonMap);
+	}	
+	
 	// query를 분석하여 ps 형태로 전달 - serviceCall 보조함수
-	private Map<String, Object> query2Map(Map<String, Object> requestData, String queryOrigin){	
+	private List<Map<String,Object>> query2Map(Map<String, Object> requestData, String queryOrigin){	
 		// 쿼리 문자열을 가공하여 ? 표시 변경
 		String queryReplace=queryOrigin.replaceAll("\\{:[^\\}]*\\}","?");
 		
@@ -156,62 +162,68 @@ public class NocodeLib {
 			preparedStatement.add(tmpValue);
 			
 		}
-		//System.out.println("queryExec1 : " + NocodeDao.queryExec(queryReplace,preparedStatement.toArray()));
-
-		Map<String, Object> returnData = new HashMap<>();
-
-		return returnData;
+		//System.out.println("queryReplace : " + queryReplace);
+		//System.out.println("queryValue : " + nocodeDao.queryExec(queryReplace,preparedStatement.toArray()));
+		return nocodeDao.queryExec(queryReplace,preparedStatement.toArray());
 	}
 	// 변수 세팅을 위한 재귀함수  - serviceCall 보조함수
 	private String parser(Map<String, Object> datas, String tmpKey){
 		String[] tmpKeys=tmpKey.split("\\.");
-		
+		Matcher m = Pattern.compile("\\[\\d\\]").matcher(tmpKeys[0]);
+		String tmpValue="";
+		int tmpArr=-1;		
+		while (m.find()) { 
+			tmpValue=m.group().toString();
+			//System.out.println("tmpValue:"+Integer.parseInt(tmpValue.replaceAll("\\[","").replaceAll("\\]","")));
+			tmpArr = Integer.parseInt(tmpValue.replaceAll("\\[","").replaceAll("\\]",""));
+		}
+		//System.out.println(tmpArr);
 		if(tmpKeys.length == 1 ) return  datas.get(tmpKeys[0]).toString();
-		else if(tmpKeys.length > 1 && datas.get(tmpKeys[0]).getClass().getName()=="java.util.HashMap") {
-			Map<String, Object> reData = (Map<String, Object>) datas.get(tmpKeys[0]);
-			String reKey=tmpKey.replaceAll(tmpKeys[0]+"\\.", "");
-			return parser( reData , reKey);			
+		else if(tmpKeys.length > 1 && true
+				/*(
+					datas.get(tmpKeys[0]).getClass().getName()=="java.util.HashMap" || datas.get(tmpKeys[0]).getClass().getName()=="java.util.HashMap"
+				)*/
+			) {
+			if(tmpArr >= 0 && datas.get(tmpKeys[0].replaceAll("\\[\\d\\]","")).getClass().getName() == "java.util.ArrayList") {			
+				String reKey=tmpKey.replaceAll(tmpKeys[0].replaceAll("\\[\\d\\]","")+"\\[\\d\\]\\.", "");
+				List<Map<String,Object>> reData2 =  (List<Map<String,Object>>) datas.get(tmpKeys[0].replaceAll("\\[\\d\\]",""));
+				return parser( reData2.get(tmpArr) , reKey);
+			}
+			else if(datas.get(tmpKeys[0]).getClass().getName()=="java.util.HashMap") {
+				Map<String, Object> reData = (Map<String, Object>) datas.get(tmpKeys[0]);
+				String reKey=tmpKey.replaceAll(tmpKeys[0]+"\\.", "");
+				return parser( reData , reKey);							
+			}
 		}
 		return "";
 	}
 	
-	/*private List<Map<String,Object>> queryExec(String sql) {	
-		List<Map<String,Object>> list = nocodeDao.queryExec("SELECT * FROM `board` WHERE seq NOT IN (0)");	
-
-
-		
-		return list;
-	  }*/
-
-	
 	// 서비스콜 메인 메서드
-	public Map<String, Object> serviceCall(Map<String, Object> requestData) throws Exception{		
+	public List<Map<String,Object>> serviceCall(Map<String, Object> requestData) throws Exception{
+		Gson gson = new Gson();
 		String jsonString = json2String(requestData.get("serviceID").toString());
-		//List<Map<String,Object>> jsonArray = json2Array(jsonString);
 		Map<String,Object> jsonMap = json2Map(jsonString);		
-		//System.out.println(jsonMap.get("process").getClass());	//datas.get(tmpKeys[0]).toString();
-		System.out.println(jsonMap.get("process").getClass());
-		//System.out.println(jsonMap.get("process").get("0"));
-		//List<Map<String,Object>> processMap = json2Array(jsonMap.get("process").toString());
-		//ArrayList<String> processList = jsonMap.get("process");
-		//List<Object> objectList = new ArrayList<Object>
+		List<Map<String,Object>> processMap = json2Array(gson.toJson(jsonMap.get("process")).toString());
+		//System.out.println(processMap);
 		
-
-		System.out.println("----------[		146		]----------");
-		//System.out.println(processList);
-	    /*for(int i = 0; i < processMap.size(); i++){		//arraylist 사이즈 만큼 for문을 실행합니다.
-	        System.out.println("processMap 순서 " + i + "번째 :" + processMap.get(i));
-	        processMap.get(i).forEach((key, value) -> {		// forEach
-	            System.out.println(key + " : " + value);
-
-	            System.out.println("query : " + query2Map(requestData,value.toString()));
-	        });
-	    }
-	    System.out.println("------------------------------");*/
+		if(processMap != null) {
+			//System.out.println("----------[		210		]----------");
+		    for(int i = 0; i < processMap.size(); i++){		//arraylist 사이즈 만큼 for문을 실행합니다.
+		        System.out.println("processMap 순서 " + i + "번째 :" + processMap.get(i));
+		        processMap.get(i).forEach((key, value) -> {		// forEach
+		            //System.out.println(key + " : " + value);
+		            //System.out.println("query : " + query2Map(requestData,value.toString()).get(0));	            
+		            requestData.put(key, query2Map(requestData,value.toString()));
+		            System.out.println(key + " : " + query2Map(requestData,value.toString()));
+		        });
+		    }
+		    //System.out.println("requestData : " + requestData);
+		    //System.out.println("------------------------------");
+		}
+	    
+	    System.out.println("returnData : " + query2Map(requestData,jsonMap.get("return").toString()));
 
 	    
-		return requestData;
+		return query2Map(requestData,jsonMap.get("return").toString());
 	}
-	
-
 }

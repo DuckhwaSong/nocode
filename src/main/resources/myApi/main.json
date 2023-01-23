@@ -1,8 +1,9 @@
 {
 	"version":"1"
+	,"description":"Ver.1 coding sample"
 	,"process":[
-		{"var1":"SELECT * FROM borad"}
-		,{"var2":"SELECT * FROM borad"}
+		{"var1":"SELECT * FROM board WHERE seq={:params.seq}"}
+		,{"var2":"SELECT * FROM board WHERE seq={:var1[0].seq}"}
 		]
-	,"return":"SELECT * FROM borad WHERE seq={:params.seq}"
+	,"return":"SELECT * FROM board WHERE seq={:params.seq}"
 }
