@@ -1,0 +1,37 @@
+{
+	"version":"2에서 재고예정"
+	,"allow":{
+		"method":["get","post"]
+		,"user-agent":"mozilla"
+		,"accept":"aplication/json"
+	}
+	,"deny":{
+		"method":["get","post"]
+		,"user-agent":"mozilla"
+		,"accept":"aplication/json"
+	}
+	,"process":[
+		{"var1":{
+			"type":"sql"
+			,"sql":"SELECT * FROM borad WHERE seq={:params.seq}"
+			}
+		}
+		,{"var2":"SELECT * FROM borad2"}
+		,{"var3":{
+			"type":"method"
+			,"class":"abc"
+			,"method":"abc"
+			,"param":"var1"
+			}
+		}
+		,{"var4":{
+			"type":"curl"
+			,"url":"http://test.com?abc=1&bbb=2"
+			,"method":"post"
+			,"post":{"form1":"value1"}
+			,"body":{"json2":"value2"}
+			}
+		}
+		]
+	,"return":"SELECT * FROM borad WHERE seq={:params.seq}"
+}
