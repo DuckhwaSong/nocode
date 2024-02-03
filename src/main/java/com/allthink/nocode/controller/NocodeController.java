@@ -155,7 +155,7 @@ public class NocodeController {
 	}
 	
 
-	
+	/*
 	// 파라메터 메핑어노테이션 테스트
 	@RequestMapping("/paramTest")
 	@ResponseBody
@@ -181,11 +181,26 @@ public class NocodeController {
 				break;
 			case "/myApi2/mapTest":
 				returnData = this.mapTest(request);
+				break;
+			case "/myApi2/mapTest2":
+				//returnData = this.mapTest(request);
+				returnData.put("test", "123");
+				//returnData.put("direct query select", nocodeDao.queryExec("SELECT * FROM `board` WHERE seq NOT IN (0)"));
+				returnData.put("direct query update", nocodeDao.queryExecUpdate("UPDATE board SET content='test1' WHERE seq=8"));
 				break;				
 			default:
 				returnData = nocodeLib.httpInfo(request);
 				break;
 		}
+		return returnData;
+
+	}
+	// 테스트!!
+	@RequestMapping("/myApi2/mapTest2")
+	@ResponseBody
+	public Map<String, Object> mapTest2(HttpServletRequest request) throws Exception{
+		Map<String, Object> returnData = new HashMap<>();
+		returnData.put("direct query update", nocodeDao.queryExecUpdate("UPDATE board SET content='test1' WHERE seq=8"));
 		return returnData;
 
 	}
@@ -210,22 +225,28 @@ public class NocodeController {
 		System.out.println(processData.getClass());
 		
 		return returnData;
-	}
+	}*/
 	
 	
 	
 	// 서비스콜 함수 - 얘만사용!!
-	@RequestMapping(path="/myApi/{serviceID}")
+	@RequestMapping(path="/{myApi}/{serviceID}")
 	//@RequestMapping(value=this.serviceUri)
 	@ResponseBody
-	public List<Map<String,Object>> serviceCall(HttpServletRequest request,@PathVariable("serviceID") String serviceID) throws Exception{		
+	public List<Map<String,Object>> serviceCall(HttpServletRequest request,@PathVariable("myApi") String myApi,@PathVariable("serviceID") String serviceID) throws Exception{		
 		Map<String, Object> requestData = nocodeLib.httpInfo(request);
+		requestData.put("myApi", myApi);		
 		requestData.put("serviceID", serviceID);		
-		List<Map<String,Object>> returnData = nocodeLib.serviceCall(requestData);		
+		List<Map<String,Object>> returnData = nocodeLib.serviceCall(requestData);
+		/*List<Map<String,Object>> returnData = new ArrayList<>();
+		Map<String,Object> tmpMap = new HashMap<>();
+		tmpMap.put("1", "2");
+		returnData.add(0,tmpMap);*/		
 		return returnData;
-	}	
-	/*public Map<String, Object> serviceCall(HttpServletRequest request,@PathVariable("serviceID") String serviceID) throws Exception{		
+	}
+	/*public Map<String, Object> serviceCall(HttpServletRequest request,@PathVariable("myApi") String myApi,@PathVariable("serviceID") String serviceID) throws Exception{		
 		Map<String, Object> requestData = nocodeLib.httpInfo(request);
+		requestData.put("myApi", myApi);		
 		requestData.put("serviceID", serviceID);		
 		Map<String, Object> returnData = nocodeLib.serviceCall(requestData);		
 		return returnData;

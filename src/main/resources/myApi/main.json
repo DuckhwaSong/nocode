@@ -1,6 +1,6 @@
 {
 	"version":"1"
-	,"description":"Ver.1 coding sample"
+	,"description":"Ver.1 coding sample - /myApi/main?seq=1"
 	,"process":[
 		{"var1":"SELECT * FROM board WHERE seq={:params.seq}"}
 		,{"var2":"SELECT * FROM board WHERE seq={:var1[0].seq}"}

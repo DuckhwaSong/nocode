@@ -104,9 +104,9 @@ public class NocodeLib {
 
 	
 	// 파일을 스트링으로 전달 - serviceCall 보조함수
-	private String json2String(String serviceID) {
+	private String json2String(String myApi,String serviceID) {
 		String returnStr= "";		
-		ClassPathResource resource = new ClassPathResource("myApi/"+serviceID+".json");		
+		ClassPathResource resource = new ClassPathResource(myApi+"/"+serviceID+".json");		
 		try {
 			Path path = Paths.get(resource.getURI());
 			returnStr = Files.lines(path).collect(Collectors.joining(System.lineSeparator()));
@@ -201,7 +201,7 @@ public class NocodeLib {
 	// 서비스콜 메인 메서드
 	public List<Map<String,Object>> serviceCall(Map<String, Object> requestData) throws Exception{
 		Gson gson = new Gson();
-		String jsonString = json2String(requestData.get("serviceID").toString());
+		String jsonString = json2String(requestData.get("myApi").toString(),requestData.get("serviceID").toString());
 		Map<String,Object> jsonMap = json2Map(jsonString);		
 		List<Map<String,Object>> processMap = json2Array(gson.toJson(jsonMap.get("process")).toString());
 		//System.out.println(processMap);
@@ -214,6 +214,7 @@ public class NocodeLib {
 		            //System.out.println(key + " : " + value);
 		            //System.out.println("query : " + query2Map(requestData,value.toString()).get(0));	            
 		            requestData.put(key, query2Map(requestData,value.toString()));
+		            requestData.put(key+"_1", "1");
 		            System.out.println(key + " : " + query2Map(requestData,value.toString()));
 		        });
 		    }
@@ -222,7 +223,6 @@ public class NocodeLib {
 		}
 	    
 	    System.out.println("returnData : " + query2Map(requestData,jsonMap.get("return").toString()));
-
 	    
 		return query2Map(requestData,jsonMap.get("return").toString());
 	}

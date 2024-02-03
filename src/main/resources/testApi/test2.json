@@ -1,0 +1,9 @@
+{
+	"version":"1"
+	,"description":"Ver.1 coding sample - /myApi/test2?seq=3"
+	,"process":[
+		{"var1":"SELECT RIGHT(content,1) as NO1 FROM board WHERE seq={:params.seq}"}
+		,{"var2":"SELECT seq FROM board WHERE seq={:var1[0].NO1}"}
+		]
+	,"return":"SELECT * FROM board WHERE seq={:var2[0].seq}"
+}

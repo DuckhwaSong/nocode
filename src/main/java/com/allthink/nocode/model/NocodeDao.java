@@ -6,7 +6,10 @@ import org.springframework.stereotype.Component;
 
 import java.util.Map;
 import java.util.List;
-//import java.util.Arrays;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.ArrayList;
+
 
 @Component
 public class NocodeDao {
@@ -31,23 +34,30 @@ public class NocodeDao {
 		System.out.println(list);
 		return list;
 	}
-	
-	
-	/*public List<Map<String,Object>> queryExec(String sql,List psArray) {	
-		List<Map<String,Object>> list = jdbcTemplate.queryForList(sql);	
-		//System.out.println(list);
-		return list;
-	}*/
-	
-	// queryForList(String sql, Object[] args, int[] argTypes)
-	  public List<Map<String,Object>> queryExec(String sql, Object[] args) {
-		
-		//System.out.println("sql : " + sql);
-		//System.out.println("args : " + args);
+	public List<Map<String,Object>> queryExec(String sql, Object[] args) {
+		List<Map<String,Object>> returnData = new ArrayList<>();
 		List<Map<String,Object>> list = jdbcTemplate.queryForList(sql, args);
-		
-		//int[] argTypes = { java.sql.Types.CHAR, java.sql.Types.INTEGER };		// 인자가 2개인 경우 타입 		
-		//List<Map<String,Object>> list = jdbcTemplate.queryForList(sql, args, argTypes);
+		returnData.addAll(0, list);
+
+		/*
+		List<Map<String,Object>> returnData = new ArrayList<>();
+		Map<String,Object> tmpMap = new HashMap<>();
+		tmpMap.put("1", "2");
+		returnData.add(0,tmpMap);
+		*/
 		return list;
-	  }
+	}
+	
+	// 업데이트 쿼리 실행
+	public int queryExecUpdate(String sql) {	
+		System.out.println("sql : " + sql);
+		return jdbcTemplate.update(sql);	
+	}
+	
+	// 쿼리 리턴 타입을 설정 list 형과 int 형 
+	public String queryType(String sql) {
+		if(Pattern.compile("^SELECT(.*)", Pattern.CASE_INSENSITIVE).matcher(sql).matches()) return "LIST";	// 셀렉트
+		if(Pattern.compile("^SHOW(.*)", Pattern.CASE_INSENSITIVE).matcher(sql).matches()) return "LIST";	// 셀렉트
+		return "INT";
+	}
 }
