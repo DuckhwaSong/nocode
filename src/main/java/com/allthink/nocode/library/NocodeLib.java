@@ -22,9 +22,12 @@ import org.springframework.stereotype.Component;
 
 import com.allthink.nocode.model.NocodeDao;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 @Component
 public class NocodeLib {
+	private Gson gson = new GsonBuilder().setDateFormat("yy-MM-dd HH:mm:ss").setPrettyPrinting().create();
+
 	@Autowired
 	private NocodeDao nocodeDao;
 	
@@ -104,9 +107,10 @@ public class NocodeLib {
 
 	
 	// 파일을 스트링으로 전달 - serviceCall 보조함수
-	private String json2String(String myApi,String serviceID) {
+	private String json2String(String serviceID) {
 		String returnStr= "";		
-		ClassPathResource resource = new ClassPathResource(myApi+"/"+serviceID+".json");		
+		//ClassPathResource resource = new ClassPathResource(myApi+"/"+serviceID+".json");		
+		ClassPathResource resource = new ClassPathResource("myApi/"+serviceID+".json");
 		try {
 			Path path = Paths.get(resource.getURI());
 			returnStr = Files.lines(path).collect(Collectors.joining(System.lineSeparator()));
@@ -119,7 +123,8 @@ public class NocodeLib {
 	// json 문자열을 jsonArray로 변환 - serviceCall 보조함수
 	private List<Map<String,Object>> json2Array(String jsonString) {
 		List<Map<String,Object>> jsonArray = new ArrayList<Map<String, Object>>();    
-		Gson gson = new Gson();
+		//Gson gson = new Gson();
+		//Gson gson = this.gson;
 		try {
 			jsonArray = gson.fromJson(jsonString, jsonArray.getClass());		    
 		} catch (Exception e) {
@@ -131,7 +136,8 @@ public class NocodeLib {
 	// json 문자열을 jsonMap으로 변환 - serviceCall 보조함수
 	private Map<String,Object> json2Map(String jsonString) {
 		Map<String,Object> jsonMap = new HashMap<>();
-		Gson gson = new Gson();
+		//Gson gson = new Gson();
+		//Gson gson = this.gson;
 		try {
 			jsonMap = gson.fromJson(jsonString, jsonMap.getClass());		    
 		} catch (Exception e) {
@@ -142,7 +148,8 @@ public class NocodeLib {
 	
 	// json 문자열을 jsonMap으로 변환 - serviceCall 보조함수
 	private String map2Json(Map<String, Object> jsonMap) {
-		Gson gson = new Gson();
+		//Gson gson = new Gson();
+		//Gson gson = this.gson;
 		return gson.toJson(jsonMap);
 	}	
 	
@@ -200,8 +207,10 @@ public class NocodeLib {
 	
 	// 서비스콜 메인 메서드
 	public List<Map<String,Object>> serviceCall(Map<String, Object> requestData) throws Exception{
-		Gson gson = new Gson();
-		String jsonString = json2String(requestData.get("myApi").toString(),requestData.get("serviceID").toString());
+		//Gson gson = new Gson();
+		//Gson gson = this.gson;
+		//String jsonString = json2String(requestData.get("myApi").toString(),requestData.get("serviceID").toString());
+		String jsonString = json2String(requestData.get("serviceID").toString());
 		Map<String,Object> jsonMap = json2Map(jsonString);		
 		List<Map<String,Object>> processMap = json2Array(gson.toJson(jsonMap.get("process")).toString());
 		//System.out.println(processMap);

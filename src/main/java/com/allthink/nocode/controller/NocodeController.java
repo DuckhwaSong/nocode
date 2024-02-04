@@ -62,6 +62,15 @@ public class NocodeController {
 	}
 	
 	// DB테스트
+	@RequestMapping("/stringTest1")
+	@ResponseBody
+	String stringTest1(HttpServletRequest request) throws Exception{
+		String returnData;
+		returnData = "[{\"seq\":1,\"content\":\"test1\",\"regDate\":\"2022-11-25T22:00:21.000+00:00\"}]";
+		return returnData;
+	}
+	
+	// DB테스트
 	@RequestMapping("/stringTest")
 	@ResponseBody
 	public Map<String, Object> stringTest(HttpServletRequest request) throws Exception{
@@ -230,12 +239,11 @@ public class NocodeController {
 	
 	
 	// 서비스콜 함수 - 얘만사용!!
-	@RequestMapping(path="/{myApi}/{serviceID}")
+	@RequestMapping(path="/myApi/{serviceID}")
 	//@RequestMapping(value=this.serviceUri)
 	@ResponseBody
-	public List<Map<String,Object>> serviceCall(HttpServletRequest request,@PathVariable("myApi") String myApi,@PathVariable("serviceID") String serviceID) throws Exception{		
+	public List<Map<String,Object>> serviceCall(HttpServletRequest request,@PathVariable("serviceID") String serviceID) throws Exception{		
 		Map<String, Object> requestData = nocodeLib.httpInfo(request);
-		requestData.put("myApi", myApi);		
 		requestData.put("serviceID", serviceID);		
 		List<Map<String,Object>> returnData = nocodeLib.serviceCall(requestData);
 		/*List<Map<String,Object>> returnData = new ArrayList<>();

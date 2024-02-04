@@ -5,5 +5,5 @@
 		{"var1":"SELECT RIGHT(content,1) as NO1 FROM board WHERE seq={:params.seq}"}
 		,{"var2":"SELECT seq FROM board WHERE seq={:var1[0].NO1}"}
 		]
-	,"return":"SELECT * FROM board WHERE seq={:var2[0].seq}"
+	,"return":"SELECT *,regDate as rdate FROM board WHERE seq={:var2[0].seq}"
 }
