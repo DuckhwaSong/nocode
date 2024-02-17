@@ -239,11 +239,11 @@ public class NocodeController {
 	
 	
 	// 서비스콜 함수 - 얘만사용!!
-	@RequestMapping(path="/myApi/{serviceID}")
+	//@RequestMapping(path="/myApi/{serviceID}")
 	//@RequestMapping(value=this.serviceUri)
 	//https://backendcode.tistory.com/228
 	//@RequestMapping("/"+serviceUri+"/{serviceID}")
-	//@RequestMapping("/*api*/{serviceID}")
+	@RequestMapping("/*Api*/{serviceID}")
 	@ResponseBody
 	public List<Map<String,Object>> serviceCall(HttpServletRequest request,@PathVariable("serviceID") String serviceID) throws Exception{		
 		Map<String, Object> requestData = nocodeLib.httpInfo(request);

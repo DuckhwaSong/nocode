@@ -19,6 +19,8 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-jdbc'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'com.google.code.gson:gson:2.9.0'	// json 활용을 위힌 gson	
+	implementation 'org.apache.commons:commons-configuration2:2.8.0'	// org.apache.commons
+	implementation 'org.ini4j:ini4j:0.5.4'	// org.apache.commons
 	runtimeOnly 'com.mysql:mysql-connector-j'
 	runtimeOnly 'com.oracle.database.jdbc:ojdbc8'
 	runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
