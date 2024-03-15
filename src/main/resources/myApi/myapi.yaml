@@ -1,0 +1,59 @@
+---
+conf:
+  version: "1"
+  title: api명
+  description: 설명을 주절주절 기록할수있다
+  method: GET,POST,DELETE
+  allowip: 10.0.0.*
+  allowtype: application/json
+param:
+  userid: '[*string]아이디'
+  name: '[string]이름'
+  age: '[int]나이'
+  gender: '[M/F]성별'
+request:
+  header:
+  body: '
+	{
+		"name":"홍길동"
+		,"userid":"gdhong"
+	}'	#문서예 request body
+response:
+  200: 정상
+  300: 비정상
+  example: '{
+		"name":"홍길동"
+		,"userid":"gdhong"
+	}'
+doc:
+  param:
+    userid: '*string:아이디'
+    name: string:이름
+    age: int:나이
+    gender: M/F:성별
+  request:
+    header: ""
+    body: '{
+		"name":"홍길동"
+		,"userid":"gdhong"
+	}'
+  response:
+    200: 정상
+    300: 비정상
+    example: '{
+		"name":"홍길동"
+		,"userid":"gdhong"
+	}'
+    depth3:
+      depth4:
+        depth5:
+          depth6: A
+process:
+  var1: '[sql]SELECT RIGHT(content,1) as NO1 FROM board WHERE seq={:params.seq}'
+  var2: '[sql]SELECT seq FROM board WHERE seq={:var1[0].NO1}'
+  var3: '[curl]'
+  var4: '[call]main/index'
+  var5: '[call]model/goodsmodel/get_goods|{:var1[0].NO1}'
+return:
+  return: SELECT *,regDate as rdate FROM board WHERE seq={:var2[0].seq}
+...
